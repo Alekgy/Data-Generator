@@ -6,11 +6,25 @@ import pandas as pd
 from generator_core import DataGenerator
 
 class DataOrchestrator:
+    """
+    Orquestador de flujos continuos (Streaming) y simulación de degradación de datos.
+
+    Gestiona la pipeline de simulación combinando la generación atómica limpia de
+    la clase DataGenerator con capas funcionales que mutan los esquemas y datos
+    con el fin de reproducir anomalías analíticas reales de entornos empresariales.
+    """
+
     def __init__(self):
+        """Inicializa el motor orquestador acoplando de forma nativa el núcleo generador."""
         self.engine = DataGenerator()
 
     def _generar_registro_limpio(self):
-        """Genera un solo diccionario base."""
+        """
+        Genera una fila única transaccional unificada con integridad referencial completa.
+
+        Returns:
+            dict: Estructura relacional balanceada que representa una venta o evento operativo.
+        """
         nombre, genero = self.engine.generar_genero_y_nombre()
         apellido = self.engine.generar_apellido()
         correo = self.engine.generar_correo(nombre, apellido)
@@ -38,16 +52,33 @@ class DataOrchestrator:
             "terminos_aceptados": terminos
         }
 
-    # =========================================================================
-    # ESCENARIOS CON GENERADORES (Usan 'yield' en lugar de listas)
-    # =========================================================================
     def stream_escenario_limpio(self, cantidad):
-        """Generador eficiente para datos limpios."""
+        """
+        Instancia un generador de bajo consumo para registros tabulares ideales.
+
+        Args:
+            cantidad (int): Volumen total de transacciones que se requieren emitir.
+
+        Yields:
+            dict: Registro transaccional limpio con estructuras semánticas y tipos nativos coherentes.
+        """
         for _ in range(cantidad):
             yield self._generar_registro_limpio()
 
     def stream_escenario_sucio(self, cantidad):
-        """Generador eficiente para datos sucios con mutación al vuelo."""
+        """
+        Instancia un generador orientado a pruebas de limpieza de datos (Data Cleansing).
+
+        Modifica los registros interrumpiendo la homogeneidad de los formatos mediante la inserción
+        aleatoria de múltiples máscaras de fecha, alternancias en la capitalización del texto,
+        espacios en blanco superfluos y concatenaciones textuales en columnas numéricas y booleanas.
+
+        Args:
+            cantidad (int): Volumen total de transacciones degradadas a procesar.
+
+        Yields:
+            dict: Fila estructurada pero con formatos internos inconsistentes o corruptos.
+        """
         formatos_fecha_erroneos = ["%d/%m/%Y", "%m/%d/%Y", "Fecha: %Y-%m-%d"]
         for _ in range(cantidad):
             reg = self._generar_registro_limpio()
@@ -73,7 +104,19 @@ class DataOrchestrator:
             yield reg
 
     def stream_escenario_basura(self, cantidad):
-        """Generador eficiente para la capa Bronze, combinando flujos."""
+        """
+        Instancia un generador analítico complejo enfocado en simular la capa cruda de un Data Lake.
+
+        Aplica una mutación acumulativa: hereda la degradación de formatos del escenario sucio y,
+        además, altera la topología del esquema (Schema Drift) eliminando llaves del diccionario de forma
+        aleatoria e inyectando bloques JSON semiestructurados con metadatos de sistemas web externos.
+
+        Args:
+            cantidad (int): Volumen total de registros caóticos a producir.
+
+        Yields:
+            dict: Payload semiestructurado con llaves asimétricas y ruido del sistema integrado.
+        """
         llaves_omitibles = ["correo", "direccion", "tipo_documento", "celular", "metodo_pago"]
         publicidad_basura = [
             {"meta_banner_click": "true", "utm_source": "facebook_ads"},
@@ -82,7 +125,6 @@ class DataOrchestrator:
             {"api_request_payload_size_bytes": 2048, "retry_count": 0}
         ]
         
-        # Consumimos del generador sucio registro por registro
         for reg in self.stream_escenario_sucio(cantidad):
             if random.random() < 0.35:
                 columna_a_borrar = random.choice(llaves_omitibles)
@@ -93,16 +135,22 @@ class DataOrchestrator:
                 
             yield reg
 
-    # =========================================================================
-    # EXPORTADOR POR BLOQUES (Ultra bajo consumo de RAM)
-    # =========================================================================
     def exportar_datos_stream(self, generador_datos, formato, nombre_archivo):
-        """Escribe los datos iterativamente en el disco sin saturar la RAM."""
+        """
+        Orquesta la persistencia física directa hacia almacenamiento persistente en modo Streaming.
+
+        Consume las funciones generadoras de manera incremental. En formatos planos (CSV/JSON) escribe
+        fila por fila directamente al buffer del archivo. En formatos analíticos y binarios
+        (Parquet, Excel, TXT) acumula micro-bloques en memoria y ejecuta inserciones parciales iterativas.
+
+        Args:
+            generador_datos (generator): Flujo iterable activo que emite los registros.
+            formato (str): Extensión destino elegida para persistir (csv, json, parquet, txt, xlsx, xls).
+            nombre_archivo (str): Nombre base del archivo físico final que se grabará en disco.
+        """
         formato = formato.lower()
 
-        # 1. EXPORTAR A CSV (Streaming puro, fila por fila)
         if formato == "csv":
-            # Para la cabecera tomamos un registro de muestra
             primer_registro = next(generador_datos)
             columnas = list(primer_registro.keys())
             
@@ -111,13 +159,11 @@ class DataOrchestrator:
                 writer.writeheader()
                 writer.writerow(primer_registro)
                 
-                # Consumir el resto del generador directo al disco
                 for reg in generador_datos:
                     writer.writerow(reg)
             print(f" [STREAM OK] Guardado en: {nombre_archivo}.csv")
             return
 
-        # 2. EXPORTAR A JSON (Formato de lista iterativa)
         elif formato == "json":
             with open(f"{nombre_archivo}.json", "w", encoding="utf-8") as f:
                 f.write("[\n")
@@ -131,9 +177,7 @@ class DataOrchestrator:
             print(f" [STREAM OK] Guardado en: {nombre_archivo}.json")
             return
 
-        # 3. FORMATOS ANALÍTICOS (Parquet, XLSX, TXT) mediante Chunks de Pandas
         else:
-            # Agrupamos los datos en bloques pequeños (ej: de a 10,000 filas)
             chunk_size = 10000
             chunk = []
             es_primero = True
@@ -146,7 +190,6 @@ class DataOrchestrator:
                     chunk = []
                     es_primero = False
             
-            # Escribir el residuo que quede
             if chunk:
                 df = pd.DataFrame(chunk)
                 self._escribir_chunk_pandas(df, formato, nombre_archivo, es_primero)
@@ -154,27 +197,30 @@ class DataOrchestrator:
             print(f" [CHUNK OK] Guardado en avanzado: {nombre_archivo}.{formato}")
 
     def _escribir_chunk_pandas(self, df, formato, nombre_archivo, es_primero):
-        """Escribe bloques parciales (append) según el formato."""
+        """
+        Escribe un DataFrame de Pandas parcial (Chunk) en el formato binario o analítico correspondiente.
+
+        Args:
+            df (DataFrame): Bloque de datos encapsulado por Pandas en memoria RAM.
+            formato (str): Extensión tecnológica de salida.
+            nombre_archivo (str): Nombre físico del archivo en el sistema de directorios.
+            es_primero (bool): Indica si se debe crear el archivo e inicializar cabeceras o
+                añadir datos al final (append) de un archivo existente.
+        """
         if formato == "txt":
             mode = "w" if es_primero else "a"
             header = es_primero
             df.to_csv(f"{nombre_archivo}.txt", sep="\t", index=False, mode=mode, header=header)
             
         elif formato == "parquet":
-            # Parquet nativo permite append por filas usando fastparquet o pyarrow.dataset
-            # Para simplificar manteniéndolo ligero, pyarrow maneja append de tablas:
             import pyarrow as pa
             import pyarrow.parquet as pq
             table = pa.Table.from_pandas(df)
-            mode = "w" if es_primero else "a"
             if es_primero:
                 self.parquet_writer = pq.ParquetWriter(f"{nombre_archivo}.parquet", table.schema)
             self.parquet_writer.write_table(table)
             
         elif formato in ["xlsx", "xls"]:
-            # Excel no soporta streaming nativo real de forma fácil sin cargar el libro completo.
-            # Sin embargo, usando openpyxl en modo 'a' se mitiga el impacto. 
-            mode = "w" if es_primero else "a"
             if es_primero:
                 df.to_excel(f"{nombre_archivo}.{formato}", index=False)
             else:
@@ -182,9 +228,6 @@ class DataOrchestrator:
                     df.to_excel(writer, index=False, header=False, startrow=writer.sheets['Sheet1'].max_row)
 
 
-# =========================================================================
-# MENÚ INTERACTIVO (CLI)
-# =========================================================================
 if __name__ == "__main__":
     orquestador = DataOrchestrator()
     print("\n==========================================================")
@@ -216,7 +259,6 @@ if __name__ == "__main__":
         formatos_map = {1: "json", 2: "csv", 3: "txt", 4: "xlsx", 5: "xls", 6: "parquet"}
         formato = formatos_map.get(formato_opcion, "csv")
         
-        # En vez de almacenar listas, pasamos la FUNCIÓN GENERADORA (sin ejecutar con paréntesis aún)
         if opcion == 1:
             gen = orquestador.stream_escenario_limpio(cantidad)
             archivo_final = "datos_perfectos"
@@ -230,10 +272,8 @@ if __name__ == "__main__":
             print("Opción inválida.")
             exit()
             
-        # Lanzar el guardado iterativo
         orquestador.exportar_datos_stream(gen, formato, archivo_final)
         
-        # Si se abrió un stream de parquet, cerrarlo de forma segura
         if formato == "parquet" and opcion == 1:
             orquestador.parquet_writer.close()
             
