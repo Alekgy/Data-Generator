@@ -1,0 +1,88 @@
+{
+  "nombres": {
+    "masculinos": [
+      "Alejandro", "Mateo", "Juan", "Daniel", "Carlos", "Andrés", "Santiago", 
+      "Sebastián", "Samuel", "Nicolás", "Gabriel", "Diego", "Tomás", "Lucas", 
+      "Felipe", "Martín", "Javier", "Esteban", "Adrián", "Manuel", "David", 
+      "Julian", "Leonardo", "Isaac", "Simon"
+    ],
+    "femeninos": [
+      "Camila", "Valentina", "Mariana", "Gabriela", "Isabella", "Sofia", "Lucía", 
+      "Natalia", "Elena", "Daniela", "Valeria", "Manuela", "Catalina", "Sara", 
+      "Juliana", "Paula", "Carolina", "Victoria", "Salomé", "Antonia", "Laura", 
+      "Emilia", "Andrea", "Milena", "Diana"
+    ]
+  },
+  "apellidos": [
+    "Gómez", "Rodríguez", "Martínez", "López", "González", "Pérez", "Sánchez", 
+    "Ramírez", "Torres", "Díaz", "Vargas", "Castro", "Morales", "Suárez", "Herrera", 
+    "Muñoz", "Jiménez", "Rojas", "Ortiz", "Silva", "Machado", "Gutiérrez", "Ríos", 
+    "Alvarez", "Mendoza", "Patiño", "Montoya", "García", "Bermúdez", "Henao", 
+    "Palacios", "Ochoa", "Restrepo", "Cárdenas", "Salazar", "Mejía", "Ortega", 
+    "Miranda", "Benítez", "Molina", "Franco", "Agudelo", "Arias", "Cardona", 
+    "Giraldo", "Marin", "Hoyos", "Duque", "Villegas", "Valencia"
+  ],
+  "alfanumerico": {
+    "mayusculas": [
+      "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    ],
+    "minusculas": [
+      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", 
+      "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+    ],
+    "numeros": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "especiales": [
+      "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "+", 
+      "=", "[", "]", "{", "}", "|", "\\", ":", ";", "\"", "'", "<", ">", 
+      ",", ".", "?", "/"
+    ]
+  },
+  "correos": [
+    {"dominio": "gmail.com", "peso": 55},
+    {"dominio": "hotmail.com", "peso": 20},
+    {"dominio": "outlook.com", "peso": 10},
+    {"dominio": "yahoo.com", "peso": 8},
+    {"dominio": "icloud.com", "peso": 4},
+    {"dominio": "hotmail.com.co", "peso": 2},
+    {"dominio": "proton.me", "peso": 1}
+  ],
+  "nomenclaturas": {
+    "vias_principales": [
+      "Calle", "Carrera", "Avenida", "Diagonal", "Transversal", 
+      "Circular", "Avenida Calle", "Avenida Carrera", "Variante"
+    ],
+    "vias_secundarias_y_complementos": [
+      "Sur", "Este", "Oeste", "Norte", "Bis", "A", "B", "C", "D", "E"
+    ],
+    "tipos_de_inmueble": [
+      "Apartamento", "Casa", "Local", "Oficina", "Bodega", "Consultorio", 
+      "Piso", "Bloque", "Interior", "Torre"
+    ]
+  },
+  "documentos_identidad": [
+    {"tipo": "CC", "peso": 85, "descripcion": "Cédula de Ciudadanía"},
+    {"tipo": "CE", "peso": 8, "descripcion": "Cédula de Extranjería"},
+    {"tipo": "NIT", "peso": 5, "descripcion": "Número de Identificación Tributaria"},
+    {"tipo": "PP", "peso": 2, "descripcion": "Pasaporte"}
+  ],
+  "estados_registro": [
+    {"estado": "Activo", "peso": 80},
+    {"estado": "Inactivo", "peso": 15},
+    {"estado": "Pendiente", "peso": 5}
+  ],
+  "formatos_fecha": [
+    "YYYY-MM-DD",
+    "DD/MM/YYYY",
+    "MM/DD/YYYY"
+  ],
+  "prefijos_celular": [
+    "300", "301", "302", "304", "305", "310", "311", "315", "320", "350"
+  ],
+  "metodos_pago": [
+    {"metodo": "Efectivo", "peso": 40},
+    {"metodo": "Plataformas Digitales (Nequi/Daviplata)", "peso": 35},
+    {"metodo": "Tarjeta de Crédito", "peso": 15},
+    {"metodo": "Transferencia Bancaria", "peso": 10}
+  ]
+}
